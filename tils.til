@@ -1,0 +1,716 @@
+# Selected Character Count
+
+When highlighting a word in vim (Visual Mode), type:
+
+```
+g<CTRL-g>
+```
+
+In the command section of vim you'll see: something like this.
+
+```
+Selected 1 of 90 Lines; 2 of 715 Words; 15 of 4171 Chars; 15 of 4173 Bytes
+```
+
+In this case, `15 of 4171 Chars` is the number of total characters and the number of characters selected.
+
+Its not as straight forward or as easy to parse as you might expect, but when
+you know what to look for it becomes easy to read.
+
+
+# Full page screenshots in Firefox
+
+Firefox has an interesting feature called the `Developer Toolbar`.  This
+toolbar is entirely separate from the JS console and provides a cli for custom
+commands for specific functionality. It can opened with `shift-F2` or `Tools >
+Developers > Developer Toolbar`.
+
+In that toolbar, type `screenshot --fullpage my-page.png` and a png file with
+the given name will be saved to the Downloads folder.  The file format will
+always be png.
+
+[Source](http://stackoverflow.com/questions/13158083/take-a-full-page-screenshot-with-firefox)
+
+More `Developer Toolbar` information can be found [here](https://developer.mozilla.org/en-US/docs/Tools/GCLI).
+
+Type `help` in the toolbar to see all the commands.
+
+# Debug :hover selectors in CSS
+
+When styling HTML you may need to define a hover style the css of which might
+look like this:
+
+``` css
+div.something:hover {
+  background-color: red;
+}
+```
+
+The div with class something will now have a red background when your mouse
+hovers over it.
+
+This can be hard to debug however, if this were a regular style we could
+inspect it and change the style of the element in dev tools.  With hovers, the
+style is only available in dev tools when the mouse is physically over the
+element.
+
+Chrome has a facility to declare that a hover state should be _on_ for an
+element.  Simply open dev tools and in the "Elements" tab right click an
+element to get a context menu.  The menu will have options :active, :hover,
+:focus, and :visited.  Choose `:hover` and the hover state will be permenantly
+affixed to that element.  You can now play with the hover style until it looks
+right.
+
+# jQuery.map returns wrapped elements
+
+There are thousands of ways to write JavaScript and many ways to `map` over a
+collection in JavaScript.  The jQuery variant of the function has a couple of
+peculiararities that might trip you up however.
+
+First, the arguments to the map function are not `(item, index)` like they are
+for the `Array.prototype.map` function. Instead, they are `(index, item)`.
+
+Second, the jQuery map function does not return an array consisting of the
+values returned from the map function.  It instead returns an array of those
+values _wrapped by jQuery_.
+
+This can be unexpected when iterating over a set of elements to create an array
+of derived values.
+
+# `mix compile.app`
+
+# Submit a pull request from the command line
+
+Github offers a git extension for augmenting the git command line tool with
+github specific functionality.  This extension is called
+[hub](https://github.com/github/hub).
+
+`hub` adds the git alias `pull-request` to git.  This alias/command creates a
+pull request from the current branch to master by default:
+
+```
+git pull-request
+```
+
+Additionally, you can specify which branch would be the base with the first
+argument and which branch would be the head with the second argument, like so:
+
+```
+git pull-request devolop feature/add_colors
+```
+
+# Matching on directories for vim's autocmd
+
+Generally, vim users use the `autocmd` command to set specific options for filetypes.  Like, if you want all Ruby files to have the `shiftwidth` option set to 2 then you would include an autocmd line like this in your `~/.vimrc` file:
+
+``` vimscript
+autocmd BufRead *.rb set shiftwidth=2
+```
+
+I wanted to do something a bit different.  I wanted to set the color scheme for each file in a directory rather than for a file type, and I tried this:
+
+```
+autocmd BufRead *writing* color shine
+```
+
+Nothing happened.
+
+Via `:help autocmd-patterns` I was able to learn that if there isn't a slash char (`/`) anywhere in the pattern then it just tries to match on the filename.  If a slash is included however, the whole path for that file is matched.  All I needed was to add a slash:
+
+```
+autocmd BufRead */writing* color shine
+```
+
+Shine On.
+
+# Convert binary to decimal at the command line
+
+If you have a binary number that you'd like to see in decimal form you can run
+the command:
+
+```
+> printf '%d\n' 0b10001001
+137
+```
+
+# Get the starting hex chars of a binary file
+
+The starting 2 to 8 bytes are used at times to identify binary file type.  You
+can see what those bytes are in hex format with the `xxd` command.
+
+```
+> xxd -len 8 beach.png
+00000000: 8950 4e47 0d0a 1a0a                      .PNG....
+```
+
+`xxd` is a command used to create hex dumps.
+
+# yank full line without new line
+
+I am often in a scenario where I want to take all the contents of the current
+line and paste them into the middle of another line, perhaps into some
+parentheses or quotation marks.
+
+If I'm in the middle of a line I can type `^y$` which will goto the first
+character of the line and then yank to the end without the newline.
+
+This is the rare palindramic vim command.  It works the same backwards as well
+(`$y^`).
+
+There is also a plugin that treats the line as a vim object called
+[vim-textobj-line](https://github.com/kana/vim-textobj-line).  Check it out!
+
+
+# Turn off folds in my vim buffer!
+
+Sometimes, a [co-worker](https://hashrocket.com/rocketeers/brian-dunn) will come over to your vim session and just start folding things.
+
+In these cases, turn off folds with the ever valuable `:set nofoldenable`.
+
+If _all_ the buffers have been folded then consider, `:bufdo nofoldenable`.
+
+# Debug the `--exclude-pattern` option in rspec.
+
+You can exclude certain files from being run by rspec with the --exclude-pattern option like so: `rspec --exclude-pattern run_me_not_spec.rb`.
+
+You can even place this option into your `.rspec` file.
+
+When doing this and then committing the `.rspec` file its helpful to make sure the exclude pattern is correct.  Try this string of options:
+
+```
+rspec --dry-run -fdoc | grep 'excluded test name'
+```
+
+If no results are returned, then you are successfully excluding the test!  The `--dry-run` option is important for when actually running the test suite to produce the fdoc output would take too much time.
+
+# Show commits in the order they were committed
+
+When reviewing a series of commits its sometimes helpful to review them in the order they were committed.
+
+By default, if you pass a range to `git show`, like `git show HEAD..master`
+(assuming you are on a different branch and master is ahead by a number of
+commits) the commits will be shown in the order of most recent to least recent.
+
+To view the commits in least recent to most recent order use the `--reverse`
+flag:
+
+```
+git show HEAD..master --reverse
+```
+
+# Detach other users in tmux
+
+If someone else has attached to your tmux session but by doing so shrank the
+tmux screen to a small size, then you are well within your rights to kick them
+out and regain your real estate.
+
+`<leader>D` will present you with all the connections.  The selection you make will be detached from the current tmux session.
+
+Use this power wisely.
+
+# Scoping actions to elements in Wallaby
+
+Wallaby, the browser testing dsl/package for Elixir, has the ability to scope
+actions by passing a function as the third argument to `find`.
+
+```
+find(session, select("Years"), fn (element) ->
+  click(element, option("2017"))
+end)
+```
+
+In the above example, we need to choose an option `2017` but its possible that
+there are two selects in the page with the option `2017`.  Even if only one select was on the page its best practice to scope option selection to a specifc select
+field.
+
+In Ruby/Capybara this would be done with the `within` function.
+
+# Remove key/value from jsonb data structure
+
+If you store jsonb in your postgres database, you will find yourself
+manipulating json data periodically in postgres.
+
+Removing a key/value from a jsonb object is very simple, just use the
+subtraction operator.
+
+```
+> select '{"a": 1, "b": 2}'::jsonb - 'a';
+ ?column?
+----------
+ {"b": 2}
+(1 row)
+```
+
+# Create jsonb data structure from columns
+
+You can create a jsonb object by casting a string version of the object to jsonb:
+
+```
+> select '{"a": 1, "b": 2}'::jsonb;
+      jsonb
+------------------
+ {"a": 1, "b": 2}
+```
+
+When using values from columns to create a jsonb object you its not practical to construct a string.  In this case you want to use `jsonb_build_object`:
+
+```
+> select jsonb_build_object('a', a.x) from (select x from generate_series(1, 10) as x) as a;
+ jsonb_build_object
+--------------------
+ {"a": 1}
+ {"a": 2}
+ {"a": 3}
+ {"a": 4}
+ {"a": 5}
+ {"a": 6}
+ {"a": 7}
+ {"a": 8}
+ {"a": 9}
+ {"a": 10}
+```
+
+# Determine the type of buffer
+
+The `:set <option>` command will show the value of an option.  In the case of
+`:set buftype` this is generally set to nothing.  It's empty.  This is because we're usually working with a normal buffer.  The exception is the quick window.  Generally, the buftype of the quick window is `quickwindow`.  The `help` window also has its own buftype, `help`.
+
+These values are used programmatically to help create features with vimscript.
+
+See more with: `:help buftype`
+
+# Jaro Distance determines "closeness" of 2 strings
+
+In Elixir, the `String` module includes a function named `jaro_distance` that
+determines the similarity between two strings:
+
+```
+iex> String.jaro_distance("Chris", "Crhis")
+0.9333333333333332
+iex> String.jaro_distance("Chris", "Bob")
+0.0
+iex> String.jaro_distance("Chris", "Dennis")
+0.5777777777777778
+```
+
+The docs say this works best with short strings.  The [Jaro distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance) article
+on wikipedia has lots of math if your into that.
+
+# Bits of Characters
+
+If you are curious what the binary of an ascii/utf-8 char is you can use this
+string of commands at the command line:
+
+```
+echo 'A' | xxd -b
+```
+
+The `A` character is 65 in ascii which is 64 + 1. `01000000` is 64. `00000001` is of course 1, `01000001` is 65.
+
+```
+echo 'a' | xxd -b
+```
+
+The `a` character is 97 in ascii which is 64 + 32 + 1. `00100000` is 32 in binary, given this and the above, `01100001` is 97.
+
+```
+echo '🤓' | xxd -b
+```
+
+This ridiculous emoji is a utf-8 char.  When you look at the binary for it:
+
+```
+11110000 10011111 10100100 10010011
+```
+
+You can see that every byte begins with a 1 which means that it will combine
+with any subsequent byte beginning with 1 to form a unique character.
+
+
+# Inspect with Label
+
+`IO.inspect` returns the value you pass in as the first argument.  This is great when you want to debug the middle state of a series of piped calls.
+
+```
+"ABCDEFG"
+|> String.graphemes
+|> Enum.each_with_index
+|> IO.inspect
+|> Enum.map(fn({letter, i}) -> "#{letter}#{i}" end)
+|> Enum.join
+```
+
+Here, inspect will write to stdout the values `[{"A", 1}, {"B", 2"}...]`.
+
+`IO.inspect` also takes a `label` option, which decorates the values written to
+stdout but does not disrupt the piped calls.
+
+```
+"ABCDEFG"
+|> String.graphemes
+|> Enum.each_with_index
+|> IO.inspect(label: "Letters with index:")
+|> Enum.map(fn({letter, i}) -> "#{letter}#{i}" end)
+|> Enum.join
+```
+
+Which outputs `Letters with index: [{"A", 1}, {"B", 2"}...]` to stdout.
+
+# ls -lO see of files
+
+# Extended file attributes on macOS
+
+You can store metadata on any file in the mac filesystem(HFS+).  If you want to ensure the file has a specific encoding, or if you want to place a checksum with the file you can use file attributes.
+
+Setting and reading are easy on macOS with the `xattr` utility:
+
+```
+> touch something.txt
+> xattr -w xyz 123 something.txt
+> xattr -p xyz something.txt
+123
+```
+
+In this example we wrote(`xattr -w`) an attribute onto the file and printed
+it(`xattr -p`) to see that it was written.
+
+You can list the file attributes with a cryptic option for ls, `ls -l@`.  Try
+doing this on your `~/Downloads` dir to learn something cool about how macOS
+treats files coming from the internet.
+
+# Ruby Enumerable `max_by`
+
+# Age in Postgres
+
+On this day every year I get curious about how old I actually am.  Postgres has
+some utilities to help me out with that, like subtraction of dates.
+
+```
+> select now() - '1978-3-24';
+14245 days 17:39:55.623866
+
+```
+
+Ah yes, 14245 days on this earth, it really makes you think.  What got returned anyways, that looks weird:
+
+```
+> select pg_typeof(now() - '1978-3-24');
+interval
+
+```
+
+Got it, that's an interval.  It doesn't really tell me much, is this interval infinite?
+
+```
+> select isfinite(now() - '1978-3-24');
+t
+```
+
+I can squint and read isfinite as infinite and suddenly my outlook changes, but
+only momentarily.
+
+Postgres, just tell me how many years I've been alive ok?  None of this days
+stuff.
+
+```
+> select age('1978-3-24'::date);
+39 years
+```
+
+Oh alright, so it is.
+
+# curl with -sS is silent
+
+# Add email to github account
+
+You can have multiple emails associated with your github account so that if your commits have `user_x@example.com` or on another machine your commits have `user_y@example.com` they'll both show up as _you_ on the github system.
+
+In my case, all commits on hashrocket workstations are
+`dev+somebody@hashrocket.com` and we change who that somebody is with the
+[pear](https://github.com/derekparker/go-pear) application.  So when I'm working on a hashrocket workstation I commit as `dev+chriserin@hashrocket.com`.
+
+When editing a profile on github there is a left hand menu labeled 'personal settings' and in that menu there is an `emails` link.  When you click `emails` you have the opportunity to 'Add email address'.  There ya go! Happy committing!
+
+H/T [Matt Polito](https://hashrocket.com/rocketeers/matt-polito)
+
+# Size of RSA encrypted content
+
+RSA encryption (publickey/privatekey) is powerful encryption but its really
+only meant to encrypt small things like other encryption keys.  The maximum
+size of the amount of data an rsa public key can encrypt is:
+
+``` ruby
+(key_size/8).floor - 11
+```
+
+So in the case of a key thats 1024 bits it can only encrypt data up to 117
+bytes long.  Not long enough for documents of any size or variable length.
+
+# cat from stdin and historical notes
+
+Generally, `cat` takes a file as an argument and prints the file to stdout.  `cat` can also print to stdout from stdin like this:
+
+```
+> echo abc | cat -
+abc
+```
+
+Which is the equivalent to:
+
+```
+> echo abc | cat
+abc
+```
+
+But when you need to concatenate a line to the beginning of a file and then
+process that result it comes in handy:
+
+```
+> echo abc | cat - 123.txt
+abc
+123
+> echo abc | cat - 123.txt | grep abc
+abc
+```
+
+The macosx `cat` man page ([here](https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/cat.1.html)) has a history section and mentions that:
+
+> Dennis Ritchie designed and wrote the first man page.  It appears to have been cat(1).
+
+So `cat` was the first man page, interesting!  (The ubuntu man page for cat
+does not mention this)
+
+# Am I connected to a terminal via ssh?
+
+When connecting to another computer via ssh the computer will have some
+environment variables that are not set otherwise.  You can examine the
+environment variables with SSH in the name with:
+
+```
+> printenv | grep SSH
+```
+
+And in both linux and macos you'll see an environment variable:
+
+```
+SSH_CONNECTION=192.168.50.3 65102 192.168.50.12 22
+```
+
+The first ip address and corresponding port represents the ip address if one
+exists and the second is the machine you are currently ssh'd into.
+
+# Use Elixir plug for only some controller actions
+
+Phoenix allows for a flexible request processing pipeline with plugs.  Your
+controllers are basically plugs in the controller pipeline.  You can specify plugs that will execute before your actions with the `plug` macro.
+
+``` elixir
+defmodule MyApp.ThingController do
+  use MyApp.Web, :controller
+
+  plug MyApp.InterestingPlug
+end
+```
+
+You can also specify a guard for this macro that will only enable this plug to be run before certain actions:
+
+``` elixir
+plug MyApp.InterestingPlug when action in [:new, :create]
+```
+
+# erlang memory usage
+
+You might be be curious how much memory your erlang vm is taking.  You can get
+that and more from `:erlang.memory`.  Below is what I get from running this
+after starting `iex` normally.
+
+```
+> :erlang.memory
+[total: 18133840, processes: 4975616, processes_used: 4974616, system: 13158224,
+ atom: 264529, atom_used: 256719, binary: 228728, code: 6640396, ets: 414904]
+```
+
+This list is confusing.  All numbers are bytes, so in total 18133840 bytes are allocated to the erlang process.  There are two subcategories `processes` and `system` and the values of those categories sum to equal the value of `total`.
+
+The remaining categories are either a component of system or a component of processes.
+
+# Customizing the output of `ps`
+
+There's a lot to know about processes, although typically we're looking for a
+mapping of pids to commands.
+
+You can customize the output of `ps` with `-o`.  The -o flag expects a comma
+separaterd list of keywords which indicate the columns that you'd like to
+display for each process.
+
+```
+> ps -o pid,command
+```
+
+The above command shows only the pid and the command w/args for each process.
+You can see all the possible keywords with `ps -L`.
+
+# Login for feature test with warden test helpers
+
+Warden provides a way to login as a user without having to go through the web
+interface that a user generally sees for sign in.
+
+``` ruby
+user = FactoryGirl.create(:user)
+login_as user, scope: :user
+```
+
+In the config block for Rspec you would include this statement:
+
+```
+config.include Warden::Test::Helpers, type: :feature
+```
+
+If you have different models for different types of users in your system you
+can sign in with different scopes.  Lets say you have a `student` user concept, you can sign in with:
+
+```
+student = FactoryGirl.create(:student)
+login_as student, scope: :student
+```
+
+# Get the association with Ecto
+
+In the schema of my post model I have this line:
+
+```
+belongs_to :developer
+```
+
+So a post is associated with a developer.  When I have a post struct and try to access the developer I might see this:
+
+```
+> Tilex.Repo.get(Tilex.Post, 42).developer
+#Ecto.Association.NotLoaded<association :developer is not loaded>
+```
+
+Getting the developer is now a two step process:
+
+1. Construct a query based on the association
+2. Use that query to acquire the struct
+
+To construct a query based on the association we can use the `Ecto.assoc` function:
+
+```
+query = Ecto.assoc(post, :developer)
+```
+
+Then this query is executed with the `Repo.one` function:
+
+```
+developer = Tilex.Repo.one(query)
+```
+
+There ya go!
+
+# Chaining expectations in Rspec
+
+Generally, we think about expectations in RSpec one at a time.  If the first expectation fails, then don't go any further.  Expectations in RSpec however are chainable, meaning, I can attach one expectation to another for the same subject and then know about the failures or successes for both expections, that looks like this.
+
+``` ruby
+expect(1).to eq(2).and eq(3)
+```
+
+Which produces output like this:
+
+```
+ Failure/Error: expect(1).to eq(2).and eq(3)
+
+          expected: 2
+               got: 1
+
+          (compared using ==)
+
+       ...and:
+
+          expected: 3
+               got: 1
+
+          (compared using ==)
+```
+
+The same result can be got from the below code which may appeal to you a bit more:
+
+```
+def chain_exp(*expects)
+  expects.inject {|exps, exp| exps.and(exp)}
+end
+
+expect(1).to chain_exp(eq(2), eq(3))
+```
+
+# A Mnemonic for changing modes
+
+Making a script file executable involves an incantation that has something to
+do with `chmod` but what exactly?  `chmod` has two modes, absolute and
+  symbolic.  In absolute mode, you set the entire set of permissions with a
+numeric value like 755.
+
+In symbolic mode, you can add or subtract permissions to either the user (u),
+group (g) or owner (o).  To give read permissions to the group type:
+
+```
+> chmod g+r myfile.txt
+```
+
+And to give execution priviledges to the owner of a file:
+
+```
+> chmod o+x myscript.rb
+```
+
+# Add files with matches to the args list
+
+If I want to change all instances of the word Apple to Orange across my entire
+project I can use the vim command:
+
+```
+:argdo %s/Apple/Orange/gc
+```
+
+But only if the files that have the word Apple are in the args list.  To
+populate the args list you can use the `args` command in combination with
+shelling out to git grep with the -l flag.
+
+```
+:args `git grep -l Apple`
+```
+
+Then, when you see the list of files with `:args`, you'll see all the files
+with the word Apple.
+
+# Private vs Public Struct members
+
+In Golang, identifiers can be either Exported or Unexported.  In other
+languages this would be known as public or private, but in golang the question
+is whether the identifiers should be able to be seen outside of the module.  If
+not?  Don't export them.
+
+The rule is simple, if an identifier is capitalized it will be exported.  This manifests itself in golang when converting a struct to JSON.
+
+``` go
+type Apple struct {
+	color string
+	weight int
+}
+
+a := json.Marshal(Apple{"green", 10})
+fmt.Println(a)
+```
+
+In this case this code will print `{}`.  To print what you would expect the
+struct should be defined with capitalized identifiers:
+
+``` go
+type Apple struct {
+	Color string
+	Weight int
+}
+```
+
+Now the marshalled struct should be `{"Color": "green", "Weight": 10}`
