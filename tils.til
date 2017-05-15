@@ -714,3 +714,244 @@ type Apple struct {
 ```
 
 Now the marshalled struct should be `{"Color": "green", "Weight": 10}`
+
+# Remount a *nix filesystem as writable
+
+When booting into safe mode in Ubuntu, because of a boot issue or some other issue, the filestyem will be read only.  You can use the `mount` command to remount the filesystem as read-write.
+
+```
+sudo mount -o rw,remount /
+```
+
+# Time travelling in rspec
+
+When basing logic on the current time its helpful for testing to have a stable
+time.  A time that does not change.  Rails has a module `ActiveSupport::Testing::TimeHelpers` that was added in Rails 4.2 to provide methods that manipulate the time during testing.
+
+``` ruby
+travel_to(Time.parse("2017-01-19")) do
+  puts Time.now.strftime(:date)
+end
+
+puts Time.now.strftime(:date)
+```
+
+The above code outputs `2017-01-19` and `2017-05-02` (the current date). A fun
+way to time travel in modern ruby.
+
+# Webmock assertion that an http request was made
+
+Webmock is a library that helps you manager the http requests that are made
+during a test.  Its not advisable to hit production systems with test-generated requests and with webmock you can stub those requests.  Sometimes to ensure functionality of your system you might want to assert that the request was made.
+
+``` ruby
+stub_request(:get, 'http://www.google.com')
+assert_requested(:get, 'http://www.google.com')
+```
+
+The `stub_request` method also returns a variable that can be passed to the
+assert function.
+
+``` ruby
+get_google = stub_request(:get, 'http://www.google.com')
+assert_requested get_google
+```
+
+# Link a file idempotently
+
+-s is for Symbolic
+-f is for force
+-n is for dereference directories ????
+
+```
+ln -nfs what_you_have what_you_want
+```
+
+# Create a github repository from the cmd line
+
+In the effort to never leave the command line anything to do with github is always a frustration.  The `hub` command line tool - a tool that augments git with github specific commands - helps out tremendously.
+
+In this case I want to create a github repository to push my code to without opening a browser, going to github, creating a repo, copying the remote address for that repo and then setting up the remote locally.
+
+It can all be done with one step.
+
+```
+hub create "exciting_open_source_tech_repo"
+```
+
+`git init` must be run first, so that there is a local repo to link to the github repo, but then your good.  Start modifying, adding and commiting as you normally would.
+
+# Opening Gnome terminal emulator
+
+In an attempt to get better with keyboard shortcuts on Ubuntu I've - for the
+time being - ditched the mouse.  I generally only use two applications, Firefox
+and Terminal.
+
+Opening a new terminal is as easy as:
+
+```
+Ctrl + Shift + T
+```
+
+It starts rather small but I resize it by using left or right with the Super (window/apple/command) key.
+
+```
+Super + Left
+Super + Right
+```
+
+Then its resized to either the left half of the screen or the right half of the
+screen.
+
+# Ubuntu default desktop manager
+
+What I like about linux is that there are configurations, you should be able to manipulate the whole system without a gui. The configuration for your default display manager, for instance, is in the `default-display-manager` file:
+
+```
+> cat /etc/X11/default-display-manager
+/usr/sbin/lightdm
+```
+
+There's a startup script `/etc/init.d/lightdm` that checks that the value stored in this file points to a `lightdm` program and then executes that program.
+
+
+# Restart or shutdown ubuntu
+
+Its easy to shutdown down Ubuntu from the commandline (given the correct permissions).  Shutdown with `shutdown` which gives you 60 seconds to reverse that decision to shutdown by cancelling with `shutdown -c`.  You can also `reboot` which takes effect right away.
+
+``` sh
+shutdown # shutdown
+shutdown -c # cancel that shutdown.
+reboot # reboot the computer now
+```
+
+# keeping track of your CPU HEAT
+
+If you've ever built your own computer, you've had anxiety about not having put everything together right and maybe even something critical, like the mechanisms that keep the computer and the CPU cool.
+
+On Ubuntu you can intall the `lm-sensors` software which provides you with the
+facilities to get information the various heat levels inside the computer.
+
+```
+> sudo apt-get install lm-sensors
+> sensors
+asus-isa-0000
+Adapter: ISA adapter
+cpu_fan:        0 RPM
+
+acpitz-virtual-0
+Adapter: Virtual device
+temp1:        +27.8°C  (crit = +119.0°C)
+temp2:        +29.8°C  (crit = +119.0°C)
+
+coretemp-isa-0000
+Adapter: ISA adapter
+Package id 0:  +26.0°C  (high = +80.0°C, crit = +100.0°C)
+Core 0:        +23.0°C  (high = +80.0°C, crit = +100.0°C)
+Core 1:        +24.0°C  (high = +80.0°C, crit = +100.0°C)
+Core 2:        +24.0°C  (high = +80.0°C, crit = +100.0°C)
+Core 3:        +24.0°C  (high = +80.0°C, crit = +100.0°C)
+```
+
+
+# Select to clipboard at the Ubuntu command line
+
+Copying and pasting without a mouse - or programmatically - can be incredibly
+challenging.  Ubuntu provides an apt-get installable program `xclip` which can
+provide X11 clipboard access at the command line.
+
+``` sh
+> echo PASTME | xclip -sel clip
+```
+
+The value `PASTME` is now in the clipboard buffer.
+
+The `-sel` or `-selection` indicates the buffer that will be used, `primary`, `secondary` or `clipboard`.  Generally, `clipboard` is the buffer that we want.
+
+To output the value of the buffer use the `-o` or `-output` flag:
+
+``` sh
+> xclip -sel clip -o
+PASTEME
+```
+
+# Compile an Elixir dependency everytime
+
+In an Elixir project, the dependencies are one-time compiles. That makes sense
+when you know the dependency is not going to change.  It stops making sense,
+however, when you need to explore how a dependency works through `IO.puts` or
+other means.  Or when you find something in a dependency you want to change and
+need to work through it within an application.
+
+In those cases Elixir provides the facility to compile a dependency each time
+it has a change in one of the component files just like how compilation in your
+application works.  You can enable this by providing a path to the location of
+the dependency in the `mix.exs` file:
+
+``` elixir
+defp dep do
+  [
+  ...
+  {:wallaby, '~> 0.16.1', path: 'deps/wallaby'}
+  ...
+  ]
+end
+```
+
+In this case the path is set to the local deps dir, where the dependency
+already exists, but you can also set it to a working directory for that
+library.
+
+# Basic logger configurations for Elixir
+
+The default configuration for a logger in the test env is:
+
+``` elixir
+config :logger, level: :warn
+```
+
+That is, of the four logging levels (defug, info, warn and error) only log
+warnings and errors.
+
+By default this logger logs to the console making the below redundant:
+
+```
+config :logger, level: :warn, backends: [:console]
+```
+
+That's the only option available by default, but there are other options
+available via hex package.
+
+With hex package
+[logger_file_backend](https://github.com/onkel-dirtus/logger_file_backend) you
+might have a different config:
+
+``` elixir
+config :logger, backends: [{LoggerFileBackend, :error_log}]
+
+config :logger, :error_log, path: 'log/here.log'
+```
+
+# Compile time purge level
+
+Elixir can conditionally remove log statements of the form `Logger.debug/2` to
+`Logger.error/2` at compile time.
+
+```
+config :logger, compile_time_purge_level: :info
+```
+
+In this configuration, logger statements like `Logger.debug("something
+inconsequential happened")` will be compiled out altogether.
+
+# Setting the desktop picture in Gnome at commandline
+
+Gnome's going to be the default desktop for Ubuntu as of version 17.10.  To me
+this is exciting stuff and its never too early to start learning how to
+configure the gnome desktop.
+
+Here's a command line statement that will set the desktop image.
+
+```
+> gsettings set org.gnome.desktop.background picture-uri file:///home/myname/Downloads/Major_Oak.JPG
+```
