@@ -695,8 +695,8 @@ The rule is simple, if an identifier is capitalized it will be exported.  This m
 
 ``` go
 type Apple struct {
-	color string
-	weight int
+  color string
+  weight int
 }
 
 a := json.Marshal(Apple{"green", 10})
@@ -708,8 +708,8 @@ struct should be defined with capitalized identifiers:
 
 ``` go
 type Apple struct {
-	Color string
-	Weight int
+  Color string
+  Weight int
 }
 ```
 
@@ -825,7 +825,7 @@ shutdown -c # cancel that shutdown.
 reboot # reboot the computer now
 ```
 
-# keeping track of your CPU HEAT
+# Keeping track of your CPU Heat
 
 If you've ever built your own computer, you've had anxiety about not having put everything together right and maybe even something critical, like the mechanisms that keep the computer and the CPU cool.
 
@@ -875,17 +875,17 @@ To output the value of the buffer use the `-o` or `-output` flag:
 PASTEME
 ```
 
-# Compile an Elixir dependency everytime
+# Compile an Elixir dependency as you change it
 
 In an Elixir project, the dependencies are one-time compiles. That makes sense
 when you know the dependency is not going to change.  It stops making sense,
-however, when you need to explore how a dependency works through `IO.puts` or
-other means.  Or when you find something in a dependency you want to change and
-need to work through it within an application.
+however, when you need to explore how a dependency works by adding debug
+statements like `IO.puts`.  Or when you find something in a dependency you want
+to change and need to test that change in an application.
 
 In those cases Elixir provides the facility to compile a dependency each time
 it has a change in one of the component files just like how compilation in your
-application works.  You can enable this by providing a path to the location of
+mix app works.  You can enable this by providing a path to the location of
 the dependency in the `mix.exs` file:
 
 ``` elixir
@@ -902,7 +902,7 @@ In this case the path is set to the local deps dir, where the dependency
 already exists, but you can also set it to a working directory for that
 library.
 
-# Basic logger configurations for Elixir
+# Logging to a file in Elixir test env
 
 The default configuration for a logger in the test env is:
 
@@ -919,7 +919,7 @@ By default this logger logs to the console making the below redundant:
 config :logger, level: :warn, backends: [:console]
 ```
 
-That's the only option available by default, but there are other options
+`:console` is the only option available by default, but there are other backends
 available via hex package.
 
 With hex package
@@ -944,7 +944,7 @@ config :logger, compile_time_purge_level: :info
 In this configuration, logger statements like `Logger.debug("something
 inconsequential happened")` will be compiled out altogether.
 
-# Setting the desktop picture in Gnome at commandline
+# Setting the desktop picture in Gnome
 
 Gnome's going to be the default desktop for Ubuntu as of version 17.10.  To me
 this is exciting stuff and its never too early to start learning how to
@@ -955,3 +955,1567 @@ Here's a command line statement that will set the desktop image.
 ```
 > gsettings set org.gnome.desktop.background picture-uri file:///home/myname/Downloads/Major_Oak.JPG
 ```
+
+# Fingerprint of an ssh key in multiple formats
+
+You might need to confirm which keys you have attached to your github account.
+Github provides a list of your keys with the associated fingerprints.  If you
+have a public key on your machine you can see what fingerprint it has with:
+
+```
+> ssh-keygen -lf ~/.ssh/id_rsa.pub
+4096 SHA256:/6Rat4zVZ0auHEwWtF4QG8NA0j4NAKWisFuXV0ZP5zk chris.erin@gmail.com (RSA)
+```
+
+Github displays an md5 fingerprint rather than a sha256 fingerprint.  You can use the `-E` flag to choose a specific hash type.
+
+```
+> ssh-keygen -E md5 -lf ~/.ssh/id_rsa.pub
+4096 MD5:e3:19:85:1c:8a:31:0f:4b:de:cb:6d:a7:64:b4:4e:e7 chris.erin@gmail.com (RSA)
+```
+
+# What file am I looking at?
+
+If you are working in an environment where the status line is not displayed and
+you don't know what file you are currently editing, you can use the `:file`
+command to give you that information.
+
+```
+:file
+"app/models/post.rb" line 43 of 139 --30%-- col 4
+```
+
+`:f` is the abbreviated version
+
+# Remove, Get, and Compile a dependency in Elixir
+
+To get a better feel for how a dependency works I'll do some `IO.puts` style
+debugging, but when I'm done I need to clean up all those `IO.puts` statements.
+
+```
+mix deps.clean ecto
+```
+
+The above command will remove two directories, the `_build/dev/lib/ecto` dir and the `deps/ecto` dir.
+
+```
+mix deps.get ecto
+```
+
+This command will resolve the dependency tree and get the appropriate version of ecto based on the information in your mix.exs file.  It will not reach out to the internet if the package is already cached as a tar file in the `.hex/packages/hexpm` dir.  It will unpack the tar file into the local `deps/ecto` dir but it will not compile it.
+
+```
+mix deps.compile ecto
+```
+
+Will compile ecto to the `_build/dev/lib/ecto` directory.
+
+
+
+# ActiveRecord `from` method
+
+Look at course manager to get a feel for how the implementation worked there.
+
+# `any` and `all` special Postgres constructs
+
+To determine if a value exists in a subquery or scalar value list you can use
+the `in` operator like:
+
+``` sql
+> select 1 in (1, 2)
+true
+```
+
+`any` and `all` go a step further by allowing for an operator in the special
+construct which is used against each value in the subquery or array (no scalar
+value list for these constructs).
+
+`any` examples:
+
+``` sql
+> select 1 = any(Array[1, 2, 3])
+true
+> select 1 > any(Array[1, 2, 3])
+false
+```
+
+`all` examples
+
+``` sql
+> select 17 <> any(Array[2, 4, 8])
+true
+> select 17 < any(Array[2, 4, 8])
+false
+```
+
+`some` is a synonym for any.
+
+
+# `border-collapse` to collapse borders
+
+There are two settings for the css property `border-collapse`, `separate` and
+`collapse`.  Table cells and the table itself can both have borders.  If the
+value `separate` is set, then each cell has its own border, with the space in
+between the borders governed by the `border-spacing` property.
+
+If `collapse` is set, then the table cells and the surrounding table will share the borders surrounding them.
+
+# Sizing hack to size the container of a background image
+
+An element that contains a background image cannot have its height and width
+derived from that background image.  An element can have a height and width
+that is determined by the size of a child element however.  Combine the two to ensure that the container of the background image has the height and width of the image itself.
+
+``` html
+<div style="background-image: url('http://example.com/image.png')">
+  <img src="http://example.com/image.png">
+</div>
+```
+
+# Specifying the private key to use in ssh
+
+A private key is necessary in ssh to authenticate the connection securely.
+Generally ssh will look for a file in the `~/.ssh/` dir with a name of `id_rsa`
+(or if not using rsa a file beginning with `id_` and the encryption algo name).  That file should contain the private key.
+
+You can, however, specify a different primary key at the command line with the `-i` flag like so:
+
+```
+ssh -i ~/.ssh/my_other_key.pem
+```
+
+Additionally, you may use the `IdentityFile` option the the `ssh_config` file to permanently configure the private key for a specific connection.
+
+# Reinstall all rubies with rvm
+
+When compiling ruby the executable is attached to various C system libs like libreadline.  If libreadline is updated then each ruby on the system attached to the old libreadline must be re-compiled. If you are using rvm then this can be done with one command:
+
+```
+rvm reinstall all --force
+```
+
+The `--force` flag will skip any question the process asks.  
+
+Be careful, if you are working on a machine that has installed many rubies and has had many projects for those rubies this could take an extraordinarily long time.
+
+# Override ssh command for git
+
+Git supports a number of [environment variables](https://git-scm.com/book/en/v2/Git-Internals-Environment-Variables) one of them being `GIT_SSH`.  You can override the default ssh command (`ssh` of course) with that environment variable.  
+
+```
+GIT_SSH=./my_ssh git pull origin master
+```
+
+In this case `my_ssh` is a bash executable file that looks like this:
+
+``` shell
+#!/bin/bash
+
+ssh -i ~/.ssh/id_rsa $1 $2
+```
+
+An idea I got from this stack overflow (answer)[https://stackoverflow.com/a/9321723].
+
+Clearly the private key file I used is the default private key file so a bit redundant but its a way to add any options that might be necessary for the ssh connection, although specifying a host configuration in the ssh_config file might be simpler.
+
+# Resetting the bundler --path
+
+When running `bundler install` you can pass an option `--path <dir>`:
+
+```
+bundle install --path ./gems
+```
+
+Which will specify where to install the gems.  This is a one time option.
+Everytime you invoke `bundle` from here on in you'll see that its using the
+directory you specificed with the --path variable as the gem directory.
+
+Bundler keeps track of this option in the `.bundler/config` file in the folder
+from where bundler was initially run.  That file looks like this:
+
+```
+---
+BUNDLE_PATH: "./gems"
+BUNDLE_DISABLE_SHARED_GEMS: "true"
+```
+
+To reset the gems path back to the default, remove the `BUNDLE_PATH` line from
+the `bundle/config` file.
+
+# Typing card suites in vim ♢♡♣♠
+
+Digraphs are two letter combinations that provide a easy way to type and remember non-ascii characters in vim.  In insert mode you can type a digraph with Ctrl-k and then two letters that map to the unicode character. 
+
+For card suites the pneumonic is lower case `c` for card and upper case `C` for clubs, `D` for diamonds, `H` for hearts, and `S` for spades.
+
+```
+cD ♢
+cC ♣
+cH ♡
+cS ♠
+```
+
+You can see all the digraphs with `:digraphs`.
+
+Now you have all the necessary unicode characters to easily create card games in the terminal!
+
+# Postgres Natural joins squash unneeded columns
+
+Dealing mostly with Rails style databases we generally write inner joins on ids
+and foreign keys but there are other ways to create joins, the most fun being
+the natural join.
+
+The below query works like a natural join but uses `inner join` syntax.  When
+two tables having columns with the same name, join on that column.  You can see
+though that both columns have been returned even though they have the same
+value.
+
+``` sql
+chris=# select * from (select 1 x) foo inner join (select 1 x) bar on bar.x = foo.x ;
+ x | x
+---+---
+ 1 | 1
+(1 row)
+```
+
+When using the `natural join` syntax the query is less verbose and only returns one column.  Postgres know that they have the same value, thats the whole point!  So only present one column.
+
+``` sql
+chris=# select * from (select 1 x) foo natural join (select 1 x) bar;
+ x
+---
+ 1
+(1 row)
+```
+
+# Navigate to Rails table definition in vim
+
+Its often necessary to know what columns are on what tables when working in
+Rails. The vim plugin `vim-rails` includes a handy command to navigate directly
+to the `db/schema.rb`, `:Eschema`. When you pass a table name as an argument,
+like `:Eschema things`, vim will open the `schema.rb` file in a buffer and
+place the cursor on the table definition for that table.
+
+H/T [Jason Cummings](https://til.hashrocket.com/authors/jasoncummings)
+
+# tmux copy-mode -u, useless or useful?
+
+Tmux comes with a key binding for both `copy-mode` and `copy-mode -u`. The
+first is straight forward, you can navigate through the window history,
+highlight something and place it into your tmux buffer. I was curious about
+what the `-u` flag was for, and the man page says:
+
+```
+The -u option scrolls one page up.
+```
+
+So the -u option just places you into copy-mode one page up.  Useless! Or wait, maybe that's something I want...
+
+# Clearing Phoenix npm cache on Heroku
+
+I recently encountered an issue where the solution, as found on the internet,
+was to remove all the npm_modules, re-install them and build again.  My issue
+however was on Heroku rather than local.  
+
+If you're using Elixier and Phoenix on Heroku then you're likely using the [heroku-buildpack-phoenix-static](https://github.com/gjaldon/heroku-buildpack-phoenix-static).  This buildpack compiles the static assets for Phoenix.
+
+This buildpack caches npm_modules by default, to clear the cache you must provide a configuration file at the root level of your project named `phoenix_static_buildpack.config` that looks like:
+
+```
+clean_cache=true
+```
+
+The buildpack will now download the npm_modules on each deployment.
+
+# Load all records for a collection's association in Ecto
+
+Lets say you get a collection of Posts with:
+
+``` elixir
+posts = Repo.all(Post)
+```
+
+If you try to access the associated developer for one of these posts, you get an error:
+
+``` elixir
+> hd(posts).developer
+#Ecto.Association.NotLoaded<association :developer is not loaded>
+```
+
+The same is true for all posts in the collection, none of them have a loaded developer.  You can load them one by one with:
+
+```
+developer = Tilex.Repo.one(Ecto.assoc(post, :developer))
+```
+
+But if you need to do this for each developer you'll get into an N+1 situation, making an additional trip to the database for each post.
+
+Instead you can load all the developers at one time with:
+
+```
+posts = Repo.preload(posts, :developer)
+```
+
+# Execute parameterized raw sql in Ecto
+
+Using sql directly is a good way to use some of the more interesting parts of sqlthat Ecto does not provide a ready abstraction for in its dsl.  And parameterization is necessary to avoid sql injection and just to be able to deal with single quotes correctly.  Its fairly straight forward once you find the right module (`Ecto.Adapters.SQL`) and function (`query` or `query!`).  Parameters are indicated by `$1`.
+
+``` elixir
+sql = """
+  select * from users where name = $1;
+"""
+
+results = Ecto.Adapters.SQL.query!(MyApp.Repo, sql, [name])
+```
+
+There is also a `stream` function on the `Ecto.Adapters.SQL` module with the same signature as `query` but the documentation doesn't necessarily state the advantages or situations where it may be useful.  More to learn.
+
+# Start JS watchers in phoenix
+
+With es6 javascript ecosystems most compilation/transpilation is done with watchers, programs that watch for changes in your code and then trigger compilation based on the changes you've made.
+
+Phoenix has a method of integrating those watchers into the server itself.
+
+``` elixir
+config :myapp, MyApp.Endpoint,
+  watchers: [yarn: ["run", "watch", cd: Path.expand("../assets", __DIR__)]]
+```
+
+The above configuration goes in `config/dev.exs` and runs the watch command whenever you start the server/endpoint.  The keyword option `cd` is as of yet undocumented in the guides, but does what you think it does, changes the directory to the path you configure, which by convention in Phoenix 1.3 would be the assets directory.  `cd` is the only keyword option.
+
+The watchers start when you run your server.  Just make a change to your javascript and refresh the page!
+
+# Resize vim window to the size of its content
+
+/f you're writing a vim plugin and in that plugin you are opening a new window to display some content, you may want to resize that window so that it is only the size of the content within.  For instance, if you have 10 lines of content but the window is half the screen, then you want to resize the window to 10 lines.
+
+Resizing a window is accomplished with the `resize` command like:
+
+``` vimscript
+:resize 10
+```
+
+Getting the number of content lines is accomplished by getting the line number of the last last:
+
+``` vimscript
+:echo line('$')
+```
+
+Putting the two together is tricky because the argument to the `resize` command is interpreted literally.  `:resize line('$')` does not work.  You have to combine the two into a string and then pass it to the execute command.
+
+``` vimscript
+:execute('resize ' . line('$'))
+```
+
+# Specifying the location of your vim plugin
+
+If you are working on a vim plugin and you want to keep this plugin amongst your projects rather than with your other vim plugins you can add a new entry to the `runtimepath` or `rtp`.
+
+Place the following in your vimrc:
+
+``` vimscript
+set runtimepath+=~/projects/vim-my-plugin
+```
+
+Or
+
+``` vimscript
+set rtp+=~/projects/vim-my-plugin
+```
+
+You can confirm that the path was added correctly by checking that setting with:
+
+``` vimscript
+set rtp
+```
+
+# Non-AR objects with instantiate_with in FactoryGirl
+
+Creating non-ActiveRecord objects with FactoryGirl is possible.  Classically, a constructor is used to set all the data attributes of an object.
+
+``` ruby
+class ParsedString
+  attr_reader :abc, :def
+  def initialize(string)
+    @abc, @def = string.split(?|)
+  end
+end
+```
+
+In the above class the attributes are set in the constructor by passing in a string that gets split into two parts on `\|`.  Lets use `instantiate_with` to determine how the object gets instantiated in FactoryGirl.
+
+``` ruby
+factory :parsed_string do
+  initial_value "123|456"
+
+  initialize_with { new(initial_value) }
+end
+```
+
+And then in the test we can `FactoryGirl.build`, like:
+
+``` ruby
+ps = FactoryGirl.build(:parsed_string)
+expect(ps.abc).to eq 123
+expect(ps.def).to eq 456
+```
+
+# Kill rogue shell processes
+
+There is a particular type of attack where an inserted usb stick can act like a keyboard, open a terminal, and start something like this:
+
+``` shell
+while (true); do something_malicious; sleep 3600; done & disown
+```
+
+This process endlessly loops, sleeps most of the time but wakes every hour to
+do something malicious.  The key thing is the end where the `&` puts it in the
+background and the `disown` will end its attachment to the current terminal.  When the terminal is closed the process will get a new parent and keep going.
+
+Its not killable through the ui, but it is still detectable and killable at the command line. First find all processes with `ps ax` with an output format that includes the parent process id, `-o pid,command,ppid`.  Next, grep for a shell program like `zsh` with a parent id of process 1.  Use `awk` to grab the pid from the first column and then convert that newline separated data into arguments with `xargs` calling `kill -9`.
+
+``` shell
+ps ax -o pid,command,ppid | grep '.*zsh.*\s1$' | awk '{print $1}' | xargs kill -9
+```
+
+This will kill all running rogue zsh processes.  There may be reasons why you'd want a process to be detached from its parent terminal, but you could easily decide that this isn't something you want _ever_ and place the above command into a cron job that runs every 2 seconds.
+
+# xargs from a file
+
+I've struggled with xargs conceptually for long time, but actually its pretty easy conceptually.  For commands that don't read from stdin but do take arguments, like `echo` or `kill`, you can turn newline separated values from stdin in into arguments.
+
+Piping to echo does not work.
+
+``` shell
+> echo 123 | echo
+# nothing
+```
+
+Using xargs it does.
+
+``` shell
+> echo 123 | xargs echo
+123
+```
+
+`xargs` can also read a file with the `-a` flag, turning each line of the file into an argument.
+
+```
+> echo "123\nabc" > test.txt
+> cat test.txt
+123
+abc
+> xargs -a test.txt echo
+123 abc
+```
+
+H/T [Brian Dunn](https://hashrocket.com/team/brian-dunn)
+
+# `with` statement has an `else` clause
+
+`with` statements are used to ensure a specific result from a function or series of functions, using the results of those functions to take actions within the `with` block.  If a function does not return a specific result (think `:error` instead of `:ok`) then you can either define specific clauses for the things you expected to go wrong, or you can just return the result that did not conform to the with clause expectations.
+
+This is the general form:
+
+``` elixir
+with {:ok, a} <- {:ok, 123} do
+  IO.puts "Everythings OK"
+end
+```
+
+A `with` with an else block:
+
+``` elixir
+with {:ok, a} <- {:error, 123} do
+  IO.puts "Everythings OK"
+else 
+  result -> IO.puts("Not OK")
+end
+```
+
+A `with` else clause with pattern matching:
+
+``` elixir
+with {:ok, a} <- {:error, "something went wrong"} do
+  IO.puts "Everythings OK"
+else 
+  {:error, message} -> IO.puts(message)
+  error -> IO.puts("I'm not sure what went wrong
+end
+```
+
+A `with` without an else clause where the error is returned from the `with` block:
+
+``` elixir
+result = with {:ok, a} <- {:error, "something went wrong"} do
+IO.puts "Everythings OK"
+end
+
+{:error, message} = results
+IO.puts "This went wrong #{message}"
+```
+
+# Split file into multiple files
+
+Bash has a handy tool to split files into multiple pieces.  This can be useful as a precursor to some parallelized processing of a large file.  Lets say you have gigabytes of log files you need to search through, splitting the files into smaller chunks is one way to approach the problem.
+
+``` shell
+> seq 10 > large_file.txt
+> split -l2 large_file.txt smaller_file_
+> ls -1
+smaller_file_aa
+smaller_file_ab
+smaller_file_ac
+smaller_file_ad
+smaller_file_ae
+large_file.txt
+```
+
+First, I created a "large" file with ten lines.  Then, I split that file into files with the prefix `smaller_file_`.  The `-l2` option for split tells split to make every 2 lines a new file.  For 10 lines, we'll get 5 files.  The suffix it adds ("aa", "ab", ...) sorts lexigraphically so that we can reconstruct the file with `cat` and globs.
+
+``` shell
+> cat smaller_file*
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+```
+
+# `github` as source block in Gemfile
+
+`source` blocks in a Ruby Gemfile help group gems together that come from the
+same source.  In addition, the Gemfile supports a `github` block for multiple
+gems that are coming from the same github repository.  In my specific case,
+there are two gemspecs in the Brian Dunn's flatware repo.
+
+``` ruby
+github 'briandunn/flatware', branch: master do
+  gem 'flatware-rspec'
+  gem 'flatware-cucumber'
+end
+```
+
+With this example, only one change is needed to change the branch that both of those gems will come from.
+
+# Access invalid record from ActiveRecord::RecordInvalid
+
+You can pass an array of hashes to `Thing.create!` in ActiveRecord.  If one of those records is invalid, then an ActiveRecord::RecordInvalid error is thrown.  You might need to know which record threw the error, in which case you can get the record off of the error.
+
+``` ruby
+bad_record = nil
+
+begin
+  Things.create!([{value: 'bad'}, {value: 'good'}])
+rescue ActiveRecord::RecordInvalid => e
+  bad_record = e.record
+end
+
+if bad_record
+  puts "got a bad record with value: #{bad_record.value}"
+end
+```
+
+# Use `source /dev/stdin` to execute commands
+
+Let's say there's a command in a file, like a README file, and you don't have any copy or paste tools handy.  You can get the command out of the README file with:
+
+``` sh
+> cat README.md | grep "^sed"
+sed -ie "s/\(.*\)/Plug '\1'/" .vimbundle.local
+```
+
+Great! Now how do we run it?  The `source` is generally used to read and execute commands in files, and really `/dev/stdin` behaves like a file.
+
+You can use the pipe operator to place the command into stdin and then `source` will read from stdin.
+
+```
+> cat README.md | grep "^sed" | source /dev/stdin
+```
+
+A simpler example can be constructed with echoing
+
+``` sh
+> echo "echo 'hi there'"
+echo 'hi there'
+```
+
+And
+
+``` sh
+> echo "echo 'hi there'" | source /dev/stdin
+hi there
+```
+
+# Mix tasks accessing the db with `Mix.Ecto`
+
+When running reports or one-off data operations it would be necessary to create
+a mix task that can access the database. Ecto provides convenience functions in
+the `Mix.Ecto` module to help facilitate setting up and starting the Ecto
+repos.
+
+The function `parse_repo(args)` will process the arguments used when calling the mix task.  It looks specifically for `-r MyApp.Repo` but if you don't pass anything it will return all the repos from the configuration.
+
+The function `ensure_started(repo)` takes the repo as an argument ensures that the Repo application has been started.  Without calling this function the Repo will throw an error when used.
+
+Put it all together:
+
+``` elixir
+defmodule Mix.Tasks.MyApp.SayHi do
+  use Mix.Task
+  import Mix.Ecto
+
+  def run(args) do
+    repo = parse_repo(args) |> hd
+
+    ensure_started(repo)
+
+    result = repo.query("select 'hi!';")
+
+    result.rows
+    |> hd
+    |> hd
+    |> IO.puts
+  end
+end
+```
+
+# Timex.format with :strftime or :relative formatters
+
+# xargs can call one program for each argument
+
+Generally, I've used `xargs` in combination with programs like `kill` or `echo` both of which accept a variable number of arguments.  Some programs only accept one argument.  
+
+For lack of a better example, lets try adding 1 to 10 numbers.  In shell environments you can add with the `expr` command.
+
+``` sh
+> expr 1 + 1
+2
+```
+
+I can combine this with `seq` and pass the piped values from `seq` to `expr` with `xargs`.
+
+```
+> seq 10 | xargs expr 1 + 
+expr: syntax error
+```
+
+In the above, instead of adding 1 to 1 and then 1 to 2, it trys to run:
+
+```
+expr 1 + 1 2 3 4 5 6 7 8 9 0
+```
+
+Syntax Error!
+
+We can use the `-n` flag to ensure that only one argument is applied at time and the command runs 10 times.
+
+``` sh
+> seq 10 | xargs -n1 expr 1 +
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+```
+
+For more insight into what's being called, use the `-t` flag to see the commands
+
+``` sh
+> seq 10 | xargs -t -n1 expr 1 +
+expr 1 + 1
+2
+expr 1 + 2
+3
+expr 1 + 3
+4
+expr 1 + 4
+5
+expr 1 + 5
+6
+expr 1 + 6
+7
+expr 1 + 7
+8
+expr 1 + 8
+9
+expr 1 + 9
+10
+expr 1 + 10
+11
+```
+
+
+
+# What are the available extensions in postgres?
+
+Are you curious what all Postgres has to offer in terms of available extensions?  You can get a list of them from the `pg_available_extensions` table.
+
+``` sql
+select * from pg_available_extensions;
+```
+
+I have 46 available and one installed (by default?), `plpgsql`.
+
+You can see all installed extensions with:
+
+``` sql
+select * from pg_extension;
+```
+
+# What you had before you saved w/`previous_changes`
+
+When you set values into the ActiveRecord object the previous values are still available with `changes`, but when you save, however you save, those changes are wiped out. You can access what those values were before saving with `previous_changes`.
+
+``` ruby
+> thing = Thing.create({color: 'blue', status: 'active'})
+> thing.color = 'red'
+> puts thing.changes
+{"color" => ['blue', 'red']}
+> puts thing.previous_changes
+{}
+> thing.save
+> puts thing.changes
+{}
+> puts thing.previous_changes
+{"color" => ['blue', 'red']}
+```
+
+# Upgrading npm when using `asdf` with `reshim`
+
+The version of `npm` that comes with `nodejs` when installed with `asdf` may not be the latest.  In my case I had npm 5.3.0 installed and the newest version is 5.4.2.  I upgraded npm with `npm install -g npm` and saw output that made me think everything installed successfully, but when I ran `npm -v` I still got 5.3.0.
+
+The answer is to use asdf's `reshim` command.
+
+``` shell
+> asdf help reshim
+asdf reshim <name> <version> 	Recreate shims for version of a package
+```
+
+I ran the following command:
+
+``` shell
+> npm -v
+5.3.0
+> asdf reshim nodejs
+> npm -v
+5.4.2
+```
+
+And now I have the latest version and everything is great!
+
+# `requestAnimationFrame` should call itself
+
+This style of animation is useful when you're making small changes via
+javascript.  When you pass `requestAnimationFrame` a callback, the callback is
+called before a browser repaint, or about 60 times a second.  To make sure that
+you're getting 60 callbacks a second, you must call `requestAnimationFrame`
+from within your callback.
+
+```
+function animate() {
+  makeSomeSmallChangeToHtmlOrCss();
+  requestAnimationFrame(animate);
+}
+```
+
+This is a recursive function, so without an exit condition, it will recurse infinitely.
+
+H/T [Brian Dunn](https://hashrocket.com/team/brian-dunn)
+
+# .babelrc ignores babel settings in package.json
+
+There are three ways to provide babel configuration listed on the [usage page](https://babeljs.io/docs/usage/babelrc/) for babelrc.  You can provide a `.babelrc` file, you can place a babel section in your `package.json` or you can declare configuration with an `env` option.
+
+If you have both a `.babelrc` in your root dir AND a babel section in your `package.json` file then the settings in the `package.json` will be completely ignored.
+
+This happened to me when needing to declare an extra plugin for babel that `create-react-app` did not provide.  I ejected from create-react-app, I added a `.babelrc` that declared the extra plugin, and this broke the build for my app.  The babel configuration for an ejected `create-react-app` is in the package.json file.
+
+# Stacking HEREDOCS
+
+I ran across this in a co-workers code yesterday.  It made my head hurt for a second.  Let's say you need a a function that takes 4 lines as an argument and outputs each of those lines to stdout.
+
+``` ruby
+def print_stanza(line1, line2, line3, line4)
+  puts line1, line2, line3, line4
+end
+
+print_stanza(<<-LINEA, <<-LINEB, <<-LINEC, <<-LINED)
+  You can get all hung up
+LINEA
+  in a prickle-ly perch.
+LINEB
+  And your gang will fly on.
+LINEC
+  You'll be left in a Lurch.
+LINED
+```
+
+The second HEREDOC starts where this first one ends, the third HEREDOC starts
+where the second one ends, etc.  Its all valid Ruby and starts to make sense if
+you look at it long enough.
+
+Most editors will not be prepared to highlight the syntax correctly.
+
+H/T [Brian Dunn](https://hashrocket.com/team/brian-dunn)
+
+# Legacy Refs vs Ref Callbacks
+
+Reactjs provides a way to get references to dom elements that react is rendering through jsx.  Previously, it was through what are now legacy refs:
+
+``` jsx
+componentWillUpdate() {
+  this.refs.thing.tagName == "div";
+}
+
+render() {
+  return (
+    <div ref="thing"/>
+  );
+}
+```
+
+Where you can assign an element an identifier and react would keep a `refs` hash up to date with references to the dom for that element.
+
+The react docs say this about the previous system.
+
+>  We advise against it because string refs have some issues, are considered legacy, and are likely to be removed in one of the future releases.
+
+The new system uses callbacks
+
+``` jsx
+render() {
+  return (
+    <div ref={(div) => { console.log('tag name:', div.tagName); }} />
+  );
+}
+```
+
+This callback is called when the component mounts with a reference to the dom element as an argument.  Importantly, when the component unmounts the callback is called again but this time with `null` as an argument.
+
+# Checking that an association is loaded
+
+Ecto will NOT load associations automatically, that is something that you must do explicitly and sometimes you might expect an association to be loaded but because of the code path travelled, it is not.
+
+You can check to see if an association is loaded with `Ecto.assoc_loaded?`
+
+``` elixir
+case Ecto.assoc_loaded?(post.channel) do
+  true -> IO.puts('yep its loaded')
+  false -> IO.puts('you do not have the data')
+end
+```
+
+# Animating polygon must have same number of points
+
+You can show an SVG polygon changing shape with SVG's animate tag.
+
+``` html
+<polygon points="100,100 0,100 0,0">
+  <animate
+    to="50,50 0,50 0,0"
+    from="100,100 0,100 0,0"
+
+    dur="10s"
+    attributeName="points"
+  />
+</polygon>
+```
+
+However, you can not animate a shape change to a different number of points.
+For instance if you have three points in the `to` attribute and four points in
+the `from` attribute, then nothing will happen.
+
+Recently, I wanted to animate a change from a 4 pointed polygon to a 5 pointed
+polygon.  In this case, I included an extra point in the 4 pointed polygon that
+was a duplicate of an existing point and right next to that same duplicated
+point.  When changing shape to a 5 pointed polygon, the previously duplicated
+point moved out from that spot to its new spot and the polygon adjusted
+accordingly and pleasingly.
+
+# Use `rehash` to get tab completion for $PATH exes
+
+If you copy an executable into your `/usr/local/bin` dir you can then run it,
+but it doesn't tab complete in zsh.  To get tab completion for that new executable without opening a new shell, run `rehash`.
+
+`rehash` is not listed in `man builtins` nor does it have its own man page, but when running `which` on the command, its listed as a builtin.
+
+```
+> which rehash
+rehash: shell built-in command
+```
+
+# Installing Ruby documentation locally with RVM
+
+```
+rvm docs generate-ri
+```
+
+Once installed you can do things at the command line like:
+
+```
+ri File
+```
+
+Which will print all the documentation for the file class.
+
+I have a co-worker that will admonish you for not having ruby documentation close at hand (read: locally).  I mean, what if you're deep in the Pensylvannia hills on a 1G connection and you need some help with the `http` api.
+
+H/T [Brian Dunn](https://hashrocket.com/team/brian-dunn)
+
+
+# Casting graphql types with inline fragments
+
+Graphql works with a type system.  You ask for fruit and it returns
+fruit, but that fruit could be a pear or an orange.
+
+(contrived example apologies)
+
+``` graphql
+interface Fruit {
+  seedless: Boolean
+}
+
+type Pear implements Fruit {
+  color: String
+}
+
+type Apple implements Fruit {
+  size: Int
+}
+```
+
+So when you ask for fruit, and you want the size of the apple, you have to let graphql know that you want an Apple and are expecting an Apple and while I'm thinking about this as casting the graphql docs call it _inline fragments_.
+
+``` graphql
+  query {
+    fruit {
+      seedless
+      ... on Pear {
+        color
+      }
+      ... on Apple {
+        size
+      }
+    }
+  }
+```
+
+The `...` is a syntactic element not a writing convention.
+
+# glamorous composition for inline styling
+
+[glamorous](https://github.com/paypal/glamorous) is a library to help style
+components from the component itself rather than from a css stylesheet.  You
+create a component with style in the form of a javascript object. 
+
+``` javascript
+require glam import 'glamorours';
+
+const InfoSpan = glam.span({
+  backgroundColor: 'none',
+  width: '20%',
+  margin: '0 1rem',
+  padding: '0 1rem',
+  display: 'inline-block',
+  boxSizing: 'borderBox'
+});
+```
+
+Later when rendering, you can use this as if it were a component.
+
+``` javascript
+render() {
+  return (
+    <div>
+      <InfoSpan>
+        Some Important Information
+      </InfoSpan>
+    </div>
+  );
+}
+```
+
+You can also compose additional glamorous components by re-using previously declared glamorous components.
+
+``` javascript
+const LeftSpan = glamorous(InfoSpan, {
+  textAlign: 'right'
+});
+
+const RedArticle = glamorous(Article, {
+  textAlign: 'left'
+});
+```
+
+# `Object.entries` helps you iterate over objects
+
+You may find yourself with an object with lots of entries that you need to transform into an array of extracted information.  For examples sake lets say:
+
+``` javascript
+  const things = {
+    a: 1,
+    b: 2
+  }
+```
+
+And we need to turn that into and array `[2, 3]`.
+
+We can use `Object.entries` to turn the object into an array of key/value tuples.
+
+``` javascript
+const arr = Object.entries(things)
+// arr === [["a", 1], ["b", 2]]
+```
+
+Then we can iterate over that array with `map`:
+
+``` javascript
+const mappedArr = arr.map((tuple) => {
+  const [key, value] = tuple;
+  return value + 1;
+});
+// mappedArr === [2, 3]
+```
+
+`Object.entries` is an ES7 proposal implemented in Chrome/Firefox/Edge and polyfilled with [CoreJS](https://github.com/zloirock/core-js), the polyfill library used by Babel.
+
+# Ch-ch-ch-ch-changes
+
+For everyfile in vim, vim remembers the position of the changes that have
+occurred.  These change positions are stored in the changes list for each file
+and can be used for intrafile navigation with the two commands `g,` and `g;`.
+
+This is really handy if you switch to a large file and need to quickly flip
+through the most recently changed sections of that file.
+
+View the entire list of changes for a file with the command `:changes`.
+
+# Reloading shell history in zsh
+
+When you start a shell your history list is populated from your `.zsh_history` file. Depending on options that you have set, when you close a shell you write your history list to that same history file. Until you close your or open new shells that history is self contained and not accessible from another shell.
+
+There is a built-in zsh command to both write and read history from the `.zsh_history` file.  `fc -W` will write to the history file.  `fc -R` will read from the history file.
+
+# Iterating over objects in Lodash
+
+Many of the Lodash collection functions iterate over either an object or an array.  Somewhat unintuitively for me, when iterating over objects the first argument of the iteratee function is a value and the second argument is the key.
+
+The [documentation](https://lodash.com/docs) for Lodash lists the arguments for the iteratee in the description for each function.  For collection functions that generally looks like this
+
+> The iteratee is invoked with three arguments:(value, index|key, collection).
+
+By searching through the documentation for `index|key` you can find all the functions for which this is true.
+
+Using a Lodash function that can return iterate over an object looks like this:
+
+``` javascript
+const result = _.map({a: 1, b: 2}, function(value, key) {
+  return value + key;
+});
+
+// result is now ["a1", "b2"]
+```
+
+# Remove namespaces for easier Xpath queries
+
+Xpath can get strange when namespaces are involved
+
+```
+> doc = Nokogiri::XML(<<-XML)
+  <a xmlns='http://www.example.com/xhtml'>
+    <b>
+      <c></c>
+    </b>
+  </a>
+  XML
+> doc.xpath("/a")
+[] # returns empty array
+> doc.xpath("/*[name()='a']")
+# returns the first node
+```
+
+The `[name()='a']` isn't really clear and will become less clear as the query
+looks for elements deeper in the document.  When the namespace doesn't provide
+any value, for instance by helping to avoid collisions, or helping to validate
+the given xml document, then removing the namespace is entirely acceptable.
+
+In Nokogiri you can remove namespaces from the document with, `remove_namespaces!`.
+
+``` ruby
+> doc.remove_namespaces!
+> doc.xpath('/a')
+[<Node a>]
+```
+
+Now traversing the document with xpath will be significantly more straightforward.
+
+# Using ngrok to evaluate webhooks in dev env
+
+A webhook, an http request to a server initiated by an outside service, is difficult to test.  The outside service must have a valid url to make the request with, but your development server generally runs on the unreachable `localhost`.
+
+The Ngrok [product page](https://ngrok.com/product) describes ngrok like this:
+
+> It connects to the ngrok cloud service which accepts traffic on a public address and relays that traffic through to the ngrok process running on your machine and then on to the local address you specified. 
+
+If I have a local dev server on port 3000 I run `ngrok` like so:
+
+```
+> ngrok http 3000
+Forwarding   http://92832de0.ngrok.io -> localhost:80
+```
+
+Then, configure the outside service to point the webhook at the `ngrok.io` address provided by the ngrok tool.  Now, your local server will receive http requests from the outside service and you can evaluate those requests effectively.
+
+# Partially body matching with webmock
+
+When using webmock to stub out a post, you can specify that the post has a
+specific body. When dealing with web apis, that body is `json` and you want to
+compare the body to a ruby `hash`, from the webmock
+[README](https://github.com/bblimke/webmock), that looks like this:
+
+``` ruby
+stub_request(:post, "www.example.com").
+  with(body: {a: '1', b: 'five'})
+```
+
+In the above example, the whole json body has to be represented in the hash.
+Webmock provides a way to just examine a portion of the json/hash with the
+`hash_including` method.  This is not the rspec `hash_including` this is a
+webmock specific function using the `WebMock::Matchers::HashIncludingMatcher`
+class.
+
+``` ruby
+stub_request(:post, "www.example.com").
+  with(body: hash_including({a: '1'}))
+```
+
+# Disabling to prevent double clicks
+
+If a link or button initiates a request that takes a long time to respond then
+the user (being a user) might click the link or button again.  Depending on the
+code implemented on the server this could put the application into a bad state.
+
+Rails has a handy feature that will disable a link or button after the user has clicked it, `disable_with`:
+
+``` ruby
+<%= link_to('something',
+      something_path(something),
+      data: {
+        disable_with: "Please wait..."
+      }
+    )
+%>
+```
+
+In Rails 5.0 and up sumbit buttons have `disable_with` set by default.  To disable `disable_with` use:
+
+```
+data: { disable_with: false }
+```
+
+# Posting data from a file with curl
+
+Iterating on an api post request with curl can be frustrating if that involves
+a lot of command line editing.  `curl` however can read a file for post body contents.  Generally the `--data` option is used like this:
+
+``` 
+curl -XPOST --data '{"data": 123}' api.example.com/data
+```
+
+But when using an `@` symbol you can reference a file
+
+```
+curl -XPOST --data @data.json api.example.com/data
+```
+
+Now, you can run the same command for each iteration and edit the `data.json`
+file containing the data to be posted with your favorite text editor
+(which is vim right?).
+
+# Cursor pagination with graphql
+
+When a graphql object has a plural type, each object of the collection from that plural type will have a `cursor` associated with it.  This cursor is generally a base64 encoded unique identifier referencing the search, the object and the place of that object amongst all objects in the collection.
+
+Ask for the cursor as a property when iterating over a collection.
+
+``` graphql
+  query {
+    User(login: 'jbranchaud') {
+      repositories(first: 100) {
+        edges {
+          node {
+            cursor
+            name
+          }
+        }
+      }
+    }
+  }
+```
+
+The above query will return a cursor for each repo.
+
+Get the last cursor of that collection with `pageInfo.endCursor`:
+
+``` graphql
+  query {
+    User(login: 'jbranchaud') {
+      repositories(first: 100) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        edges {
+          node {
+            name
+          }
+        }
+      }
+    }
+  }
+```
+
+The `endCursor` will look like:
+
+```
+Y3Vyc29yOnYyOpHOBK0NoA==
+```
+
+Use this cursor to obtain the next 100 repos with the `after` property.
+
+``` graphql
+  query {
+    User(login: 'jbranchaud') {
+      repositories(first: 100, after: "Y3Vyc29yOnYyOpHOBK0NoA==") {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        edges {
+          node {
+            name
+          }
+        }
+      }
+    }
+  }
+```
+
+# Examine owner and permissions of paths
+
+The ownership of an entire path hierarchy is important when `nginx` needs to
+read static content.  For instance, the path
+`/var/www/site.com/one/two/three/numbers.html` may be problematic when
+directory `three` is owned by `root` rather than `www-data`.  Nginx will
+respond with status code `403 (forbidden)` when `http://site.com/one/two/three/numbers.html` is accessed.
+
+To debug this scenario we need to examine the owners and pemissions of each of the directories that lead to `numbers.html`.  This can be accomplished in linux with the handy `namei` command in combination with `realpath`.
+
+Real path will return the fullpath for the file.
+
+``` sh
+> realpath numbers.html
+/var/www/site.com/one/two/three/numbers.html
+```
+
+And `namei -l <full_path>` will examine each step in the file's directory structure.
+
+```
+> namei -l $(realpath numbers.html)
+drwxr-xr-x root  root  /
+drwxr-xr-x root  root  var
+drwxr-xr-x www-data www-data www
+drwxr-xr-x www-data www-data site.com
+drwxr-xr-x www-data www-data one
+drwxr-xr-x root root two
+drwxr-xr-x www-data www-data three
+-rw-r--r-- www-data www-data numbers.html
+```
+
+Ah there it is.  The directory `two` is owned by `root` rather that `www-data`.  `chown` will help you from here.
+
+# sub_filter + proxy_pass requires no gzip encoding
+
+The nginx `sub` module is useful for injecting html into web requests at the nginx level.  It looks like this:
+
+``` nginx 
+location / {
+  sub_filter '</head>' '<script>doSomething();</script></head>';
+}
+```
+
+Replace the end closing tag with a script tag _and_ the head closing tag.
+
+This does not work however with the `proxy_pass` module response coming from the `proxy_pass` url is gzip encoded. 
+
+In this case, you want to specify to the destination server that you will accept no encoding whatoever with the `proxy_set_header` directive, like so:
+
+``` nginx
+  proxy_set_header Accept-Encoding "";
+```
+
+Altogether it looks like this:
+
+``` nginx
+location / {
+  proxy_set_header Accept-Encoding "";
+  proxy_pass http://destination.example.com
+  sub_filter '</head>' '<script>doSomething();</script></head>';
+}
+```
+
+# Killing heroku dynos
+
+Yesterday we encountered an odd situation.  A rake task running with heroku that _did not finish_.  Through no fault of our own.  
+
+We killed the local processes kicked off by the `heroku` command line tool and restarted the rake task but got an error message about only allowing one free dyno.  Apparently, the dyno supporting our rake task was still in use.
+
+First we had to examine whether that was true with:
+
+``` sh
+heroku ps -a myapp
+```
+
+Next step was to kill the dyno with the identifier provided by the above command.
+
+``` sh
+heroku ps:kill dyno.1 -a myapp
+```
+
+We ran the rake task again, everything was fine, it worked great.
+
+# What files are being sourced in zsh?
+
+Tracking down a bug in the jagged mountains of shell files that are my zsh
+configuration can be tough.  Enter the `SOURCE_TRACE` option, settable with the
+`-o` flag when opening a new shell with the zsh command.
+
+```
+zsh -o SOURCE_TRACE
+```
+
+Which outputs: 
+
+```
++/etc/zsh/zshenv:1> <sourcetrace>
++/etc/zsh/zshrc:1> <sourcetrace>
++/home/chris/.zshrc:1> <sourcetrace>
++/home/chris/.sharedrc:1> <sourcetrace>
++/home/chris/.zshrc.local:1> <sourcetrace>
+```
+
+The above output is an abbreviated representation of the _actual_ files loaded on my system.  I have language manager `asdf` installed which adds a couple of entries.  I am an `rvm` user which adds 50 (!!!) entries.  Lots of shell code to source for rvm.  Additionally, I use Hashrocket's dotmatrix which adds even more entries.  Lots of sourcing to sort through.
+
+This is handy in combination with print line (or `echo`) debugging.  It gives your print lines added context with things get noisy.
+
+
+# Remove duplicates in zsh $PATH
+
+How to do it?
+
+```
+typeset -aU path
+```
+
+There ya go.  All entries in `$PATH` are now unique
+
+How does it work?  Well that's stickier.  `path` and `PATH` are not the same thing.  You can determine that by examining the type of each with `t` variable expansion.
+
+```
+> echo ${(t)path}
+array-unique-special
+> echo ${(t)PATH}
+scalar-export-special
+```
+
+They are linked variables however, if you change one you change the other but
+they have different properties.  I have to admit at this point that
+`scalar-export-special` is something of which I'm ignorant.
+
+The `typeset` declaration is simpler, it is set the type of `path` from
+`array-special` to `array-unique-special`.  The -a flag is for array and the -U
+flag is for unique.
+
+# Comply with the erlang IO protocol
+
+Below is a basic IO server/device implementation, it receives an `:io_request` message and responds with a `:io_reply` message.
+
+``` elixir
+defmodule MYIODevice do
+  def listen() do
+    receive do
+      {:io_request, from, reply_as, {:put_chars, :unicode, message}} ->
+        send(from, {:io_reply, reply_as, :ok})
+        IO.puts(message)
+        IO.puts("I see you")
+        listen()
+    end
+  end
+end
+
+pid = spawn_link(MYIODevice, :listen, [])
+
+IO.puts(pid, "Hey there")
+```
+
+The above code outputs the following to stdout:
+
+```
+Hey there
+I see you
+```
+
+The first argument of `IO.puts/2` is a pid representing the device that is being written to, it is generally defaulted to `:stdio`)
+
+The documentation is dense, enjoy!
+[Erlang IO Protocol](http://erlang.org/doc/apps/stdlib/io_protocol.html)
+
+H/T [Brian Dunn](https://github.com/briandunn)
+
+# zsh change dir after hook w/`chpwd_functions`
+
+How does rvm work?  You change to a directory and rvm has determined which version of ruby you're using.
+
+In `bash`, the `cd` command is overriden with a `cd` function.  This isn't necessary in `zsh` because `zsh` has hooks that execute after you change a directory.
+
+If you have rvm installed in zsh you'll see this:
+
+```
+> echo $chpwd_functions
+__rvm_cd_functions_set
+> echo ${(t)chpwd_functions}
+array
+```
+
+`chpwd_functions` is an array of functions that will be executed after you run `cd`.
+
+Within the function you can use the $OLDPWD and $PWD env vars to programatically determine where you are like this:
+
+```
+> huh() { echo 'one sec...' echo $OLDPWD && echo $PWD } 
+> chpwd_functions+=huh
+> cd newdir
+one sec...
+olddir
+newdir
+```
+
+You can read more about hook functions in the [zsh docs](http://zsh.sourceforge.net/Doc/Release/Functions.html).
+
+#  Native CSS Variables
+
+CSS variables are normally associated with the pre-processor languages like SASS.  But css has its own native variables as well.  Declare them like so:
+
+``` css
+element { 
+  --black-grey: #111111;
+}
+```
+
+And then use them with the `var` function like this:
+
+``` css
+element { 
+  background-color: var(--black-grey);
+}
+```
+
+In the above example if `--black-grey` is not set then the `background-color` will fallback to the inherited value.  You can provide a default value for the variable if you anticipate it may not be set:
+
+``` css
+element {
+  background-color: var(--black-grey, black);
+}
+```
+
+Variables behave just like any other inherited or cascading properties and if you'd like them available for entire stylesheets then you would need to declare them in `:root`.
+
+``` css
+:root {
+  --one-fathom: 16rem;
+}
+```
+
+This css feature is safe to use everywhere but IE, but it is only recently safe.  Firefox enabled this feature by default in version 56 released in Sept 2017.
+
+You can read about them in the [Mozilla Docs](https://developer.mozilla.org/en-US/docs/Web/CSS/var) or the original [W3C editor's draft](https://drafts.csswg.org/css-variables/).
+
+
+# flex-flow
+
+`flex-flow` is a css property that allows you to specify both `flex-direction` and `flex-wrap` in one property.  In css parlance this is a shorthand property
+and like all [shorthand properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Shorthand_properties) the values are order agnostic when possible.
+
+It will provide minimal efficiency gains but you can just avoid writing `flex-direction` altogether.  When you need to specify a direction just type:
+
+``` css
+ul { 
+  flex-flow: row;
+}
+```
+
+And then its easy to tack on a `wrap` when you determine it is necessary:
+
+``` css
+ul {
+  flex-flow: row wrap;
+}
+```
+
+# Log rotation in ruby
+
+Jake wrote a great til about linux [log rotation](https://til.hashrocket.com/posts/61e2f0db67-logrotation-for-a-rails-app) last year. Ruby also has a log rotation alternative built into the stdlib.
+
+Generally, ruby logging looks like this:
+
+```
+require 'logger'
+logger = Logger.new('app.log')
+logger.info('starting log')
+```
+
+You can also pass a 'daily', 'weekly' or 'monthly' to the logger:
+
+```
+logger = Logger.new('week.log', 'weekly')
+```
+
+If I use this log today, Tue Jan 9, and next week on Wed Jan 17, then `ls` will show two log files:
+
+```
+week.log
+week.log.20180113
+```
+
+`20180113` is Saturday the last day of the previous logging period, a new log is started every Sunday.  NOTE: no files are deleted with this style of logging, you may potentially run out of space.
+
+You can also choose to log with the number of files to keep and the maximum size of each file.
+
+```
+logger = Logger.new('size.log', 4, 1024000)
+```
+
+In this case after producing more than 4 MB of logging information `ls` will show you.
+
+```
+size.log
+size.log.1
+size.log.2
+size.log.3
+```
+
+Compared to linux's `logrotate` this is missing features, compression for example, but for adding log rotation to your logs quickly and simply it works great.
+
+
+# Passing messages to an parent iframe
