@@ -1,0 +1,7 @@
+
+* @supports
+* imgcat -- included with iTerm utilities
+* scroll locking
+* different problematic browsers (mobile, game console)
+* Media queries based on cursor type rather than size
+* Alpha Channel in the hex values

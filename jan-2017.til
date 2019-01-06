@@ -1,0 +1,90 @@
+
+# Pure Data's netreceive uses special protocol
+
+[Pure Data](https://puredata.info/) is graphical programming language
+specialising in audio applications.  It has an object called `netreceive` that
+is a socket (either TCP or UDP) that accepts a connection and outputs messages
+sent to it.
+
+There are 2 gotcha's that I experienced in working with it.
+
+The first.  It requires a special protocol, called
+[FUDI](https://en.wikipedia.org/wiki/FUDI).  Each message must be terminated by
+a semicolon `;`.  The message can contain any number of 'atoms' (strings)
+separated by whitspace but the semicolon is essential.
+
+The second.  The documentation of pure data contains running examples, if you
+open the documentation of `netreceive` before running the object in your patch,
+you will get a `bind: Address already in use (48)` error.  Close the
+documentation and try again!
+
+# Get the mime-type of a file
+
+The `file` command for both Linux and Mac can provide mime information with the `-I` flag.
+
+``` sh
+> file -I cool_song.aif
+cool_song.aif: audio/x-aiff; charset=binary
+```
+
+There are longer flags to limit this information, `--mime-type` and `--mime-encoding`.
+
+``` sh
+> file --mime-type cool_song.aif
+cool_song.aif: audio/x-aiff
+> file --mime-type cool_song.aif
+cool_song.aif: binary
+```
+
+And if you are using this information in a script you can remove the prepended file name with the -b flag.
+
+``` sh
+> file --mime-type -b cool_song.aif
+audio/x-aiff
+> file --mime-type -b cool_song.aif
+binary
+```
+
+Combine `-b` and `-I` for a quick terse mime information command
+
+``` sh
+> file -bI cool_song.aif
+audio/x-aiff; charset=binary
+```
+
+# Netrw help screen toggling with vim-vinegar
+
+`vim-vinegar` is a vim plugin that "cleans up" Netrw as 
+
+> an attempt to mitigate the need for more disruptive "project drawer" style plugins
+
+but it turns off the Netrw header, which, while unnecessary is the second most charming feature of vim.
+
+To reclaim your Netrw header, use `I` while in Netrw.
+
+As a vim-vinegar bonus, use `-` while in a buffer to open Netrw in the directory of the current buffer.
+
+> Having rapid directory access available changes everything
+
+All quotes are from the the [vim-vinegar README](https://github.com/tpope/vim-vinegar), thank you to [Vidal](https://hashrocket.com/team/vidal-ekechukwu) for the hat tip about `I`.
+
+# Span a grid item across the entire css grid
+
+When using css grid you might want an item to span item to span across the entire grid even when that grid has many columns.
+
+Grid with many columns looks like this:
+
+``` css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+```
+
+You could certainly just use `grid-column: span 5` but if the number of columns changes then you aren't going across the entire screen.  To span a grid item across the entire css grid regardless of number of columns use the `/` operator and the index of the last column `-1`:
+
+``` css
+.item {
+  grid-column: 1 / -1;
+}
+```

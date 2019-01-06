@@ -2517,5 +2517,99 @@ size.log.3
 
 Compared to linux's `logrotate` this is missing features, compression for example, but for adding log rotation to your logs quickly and simply it works great.
 
+# Setting Struct props with index
+
+It's rare that I get a chance to use structs but yesterday while parsing some
+xml (!!!) I wrote an algorythm where it would be handy to set values of a
+struct with an incrementing number rather than a symbol.
+
+Low and Behold!  Ruby Structs allow you to set attributes with either the name
+of the property or the ordinal with which it was declared.
+
+``` ruby
+2.5.0 :001 > Apple = Struct.new(:color, :size)
+ => Apple
+2.5.0 :002 > apple = Apple.new
+ => #<struct Apple color=nil, size=nil>
+2.5.0 :003 > apple[0] = 'red'
+ => "red"
+2.5.0 :004 > apple[1] = 'huge'
+ => "huge"
+2.5.0 :005 > apple
+ => #<struct Apple color="red", size="huge">
+```
+
+Structs are a great data structure that I'm going to try to use more in my daily programming.
 
 # Passing messages to an parent iframe
+
+# Preventing access to `Window.opener`
+
+When you open a link in a new tab with `target="/Users/chriserin/Downloads/zexy-2.2.4/pd-zexy.info _blank"` like so:
+
+``` html
+<a target="_blank" href="http://some.link">Somewhere</a>
+```
+
+Then the page that you open has access to the original page through `Window.opener`.  Depending on your case you may not want this.  Actually I can't think of a case where you _do_ want the new tab to refer back to the opening tab.
+
+To prevent `Window.opener` access use `rel="noopener"`:
+
+``` html
+<a target="_blank" href="http://some.link" rel="noopener">Somelink</a>
+```
+
+At this moment, this is not available in IE _or_ Edge, check out the [caniuse](https://caniuse.com/#search=noopener) site.
+
+H/T [Dillon Hafer](http://github.com/dillonhafer)
+
+# Use jq to filter object list with regex
+
+My use case is filtering an array of objects that have an attribute that matches a particular regex and extract another attribute from that object.
+
+Here is my dataset:
+
+``` json
+[
+  {name: 'Chris', id: 'aabbcc'},
+  {name: 'Ryan', id: 'ddeeff'},
+  {name: 'Ifu', id: 'aaddgg'}
+]
+```
+
+First get each element of an array.
+
+``` json
+> data | jq '.[]'
+{name: 'Chris', id: 'aabbcc'}
+{name: 'Ryan', id: 'ddeeff'}
+{name: 'Ifu', id: 'aaddgg'}
+```
+
+Pipe the elements to `select` and pass an expression that will evaluate to truthy for each object.
+
+``` json
+> data | jq '.[] | select(true) | select(.name)'
+{name: 'Chris', id: 'aabbcc'}
+{name: 'Ryan', id: 'ddeeff'}
+{name: 'Ifu', id: 'aaddgg'}
+```
+
+Then use the `test` function to compare an attribute to a regex.
+
+``` json
+> data | jq '.[] | select(.id|test("a.")'
+{name: 'Chris', id: 'aabbcc'}
+{name: 'Ifu', id: 'aaddgg'}
+```
+
+Extract the name attribute for a more concise list.
+
+``` json
+> data | jq '.[] | select(.id|test("a.") | .name'
+Chris
+Ifu
+```
+
+Read more about [jq](https://stedolan.github.io/jq/)
+
