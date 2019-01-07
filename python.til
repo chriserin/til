@@ -1,0 +1,97 @@
+
+
+# Get the ancestors of a python class
+
+Python has inheritance, but if you encounter a Python object in a program, how
+can you tell what it's superclasses are?
+
+Use the `mro` method on `class`.
+
+``` python
+>>> something = object() type(something).mro()
+[<class 'object'>] ```
+
+This is just an object of type object, it's only class is object.  Let's get a
+bit more complicated.
+
+``` python
+>>> class Fruit:
+...     pass ...
+>>> class Apple(Fruit):
+...     pass ...
+>>> Apple.mro()
+[<class '__main__.Apple'>, <class '__main__.Fruit'>, <class 'object'>] ```
+
+OK, Apple inherits from Fruit which inherits from object.  Makes sense!
+
+# Python has tuples!
+
+I love a good tuple and in JavaScript or Ruby I sometimes use arrays as tuples.
+
+``` ruby
+[thing, 1, "Description"]
+```
+
+In those languages however, this tuple isn't finite.  Wikipedia defines tuple [thusly](https://en.wikipedia.org/wiki/Tuple).
+
+> a tuple is a finite ordered list (sequence) of elements.
+
+Python tuples look like this:
+
+```
+mytuple = (thing, 1, "Description")
+```
+
+And is it finite?
+
+``` python
+>>> mytuple.append("c")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'tuple' object has no attribute 'append'
+```
+
+No `append` attribute, ok.  But can you add tuples together?
+
+``` python
+>>> a = ('a', 'b')
+>>> a + ('c', 'd')
+('a', 'b', 'c', 'd')
+>>> a
+('a', 'b')
+```
+
+You can add tuples together but it's not mutative.
+
+A syntax quirk is the one element tuple.
+
+``` python
+>>> type(('c'))
+<class 'str'>
+>>> type(('c',))
+<class 'tuple'>
+```
+
+Include a comma after the only tuple element to ensure that the tuple is not tokenized as a string.
+
+# Where is that python function defined?
+
+If you want to look at the definition of a function in Python but you don't know where it's defined, you can access a special attribute of the function `__globals__`.
+
+In the following case I have a function imported from `nltk` called `bigram` and I want to see what file it's defined in:
+
+``` python
+>>> bigram.__globals__['__file__']
+'/Users/chriserin/.asdf/installs/python/3.7.2/lib/python3.7/site-packages/nltk/util.py'
+```
+
+`__file__` is an attribute of the globals dictionary.
+
+The special attribute `__globals__` is only available for user-defined functions.  If you try to access it for a python defined function you'll get an error:
+
+``` python
+>>> len.__globals__['__file__']
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'builtin_function_or_method' object has no attribute '__globals__'
+```
